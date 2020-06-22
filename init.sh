@@ -1,4 +1,4 @@
-local APP_ARGS=""
+APP_ARGS=""
 
 if [-n "$LOG_LEVEL"]; then
     APP_ARGS="$APP_ARGS -v $LOG_LEVEL"

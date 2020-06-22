@@ -1,12 +1,10 @@
 #!/usr/bin/python3
 
 from typing import List
-
 import logging
 from os import environ
-
+import subprocess
 import argparse
-
 from freenom import Freenom
 
 _logger: logging.Logger
@@ -35,8 +33,19 @@ class FreenomClient:
 
         return records
 
+    def get_current_public_ip(self):
+        # return self.__client.getPublicIP()
+        cmd = ["dig", "@resolver1.opendns.com",
+               "ANY", "myip.opendns.com", "+short", "-4"]
+        process = subprocess.run(cmd,
+                                 check=True, stdout=subprocess.PIPE)
+        output = process.stdout.decode('UTF-8').strip('\n')
+        if 'failed' in output:
+            raise ConnectionError(output)
+        return output
+
     def update_all_domain_records_to_current_public_ip(self, domain: str):
-        pub_ip = self.__client.getPublicIP()
+        pub_ip = self.get_current_public_ip()
         _logger.info(f"Public IP: {pub_ip}")
         records = self.get_all_records(domain)
         _logger.debug(f"Records: {records}")
