@@ -13,9 +13,13 @@ _logger: logging.Logger
 class FreenomClient:
     __client: Freenom
     __ttl: int
+    __use_dig_cmd: bool
 
-    def __init__(self, user: str, password: str, ttl: int = 300):
+    def __init__(
+        self, user: str, password: str, ttl: int = 300, use_dig_cmd: bool = False
+    ):
         self.__ttl = ttl
+        self.__use_dig_cmd = use_dig_cmd
 
         self.__client = Freenom(user, password)
         _logger.info("Logged in!")
@@ -34,15 +38,22 @@ class FreenomClient:
         return records
 
     def get_current_public_ip(self):
-        # return self.__client.getPublicIP()
-        cmd = ["dig", "@resolver1.opendns.com",
-               "ANY", "myip.opendns.com", "+short", "-4"]
-        process = subprocess.run(cmd,
-                                 check=True, stdout=subprocess.PIPE)
-        output = process.stdout.decode('UTF-8').strip('\n')
-        if 'failed' in output:
-            raise ConnectionError(output)
-        return output
+        if not self.__use_dig_cmd:
+            return self.__client.getPublicIP()
+        else:
+            cmd = [
+                "dig",
+                "@resolver1.opendns.com",
+                "ANY",
+                "myip.opendns.com",
+                "+short",
+                "-4",
+            ]
+            process = subprocess.run(cmd, check=True, stdout=subprocess.PIPE)
+            output = process.stdout.decode("UTF-8").strip("\n")
+            if "failed" in output:
+                raise ConnectionError(output)
+            return output
 
     def update_all_domain_records_to_current_public_ip(self, domain: str):
         pub_ip = self.get_current_public_ip()
@@ -73,10 +84,15 @@ if __name__ == "__main__":
         "-p", "--password", required=True, help="password of Freenom's account"
     )
     parser.add_argument(
-        "-d", "--domains", default="INFO", help="list of domains to update"
+        "-d", "--domains", required=True, help="list of domains to update"
     )
     parser.add_argument(
         "--ttl", type=int, default=300, help="TTL value to set the records"
+    )
+    parser.add_argument(
+        "--public-ip-from-dig",
+        action="store_true",
+        help="Use dig command to get public IP",
     )
 
     args = parser.parse_args()
@@ -86,7 +102,9 @@ if __name__ == "__main__":
     )
     _logger = logging.getLogger(__name__)
 
-    client = FreenomClient(args.username, args.password, args.ttl)
+    client = FreenomClient(
+        args.username, args.password, args.ttl, args.public_ip_from_dig
+    )
     for domain in args.domains.split(","):
         client.update_all_domain_records_to_current_public_ip(domain)
 
