@@ -2,17 +2,55 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
-
-  build:
-
+  build_and_push:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag freenom-domain-updater:$(date +%s)
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@v1.0
+        with:
+          timeZone: -3
+          format: "YYYYMMDDHHmmss"
+      - uses: actions/checkout@v2
+      # - name: Build the Docker image
+      #   run: docker build . --file Dockerfile --tag freenom-domain-updater:$(date +%s)
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v1.1.0
+        with:
+          # Username used to log in to a Docker registry. If not set then no login will occur
+          username: ${{ secrets.DOCKER_REPOSITORY_USERNAME }}
+          # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
+          password: ${{ secrets.DOCKER_REPOSITORY_PASSWORD }}
+          # Server address of Docker registry. If not set then will default to Docker Hub
+          # registry: # optional
+          # Docker repository to tag the image with
+          repository: ${{ secrets.DOCKER_REPOSITORY_USERNAME }}
+          # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
+          tags: ${{ steps.time.outputs.time }}
+          # Automatically tags the built image with the git reference as per the readme
+          # tag_with_ref: # optional
+          # Automatically tags the built image with the git short SHA as per the readme
+          # tag_with_sha: # optional
+          # Path to the build context
+          # path: # optional, default is .
+          # Path to the Dockerfile (Default is '{path}/Dockerfile')
+          # dockerfile: # optional
+          # Sets the target stage to build
+          # target: # optional
+          # Always attempt to pull a newer version of the image
+          # always_pull: # optional
+          # Comma-delimited list of build-time variables
+          # build_args: # optional
+          # Comma-delimited list of images to consider as cache sources
+          # cache_froms: # optional
+          # Comma-delimited list of labels to add to the built image
+          # labels: # optional
+          # Adds labels with git repository information to the built image
+          add_git_labels: true
+          # Whether to push the image
+          push: true
