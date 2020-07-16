@@ -11,7 +11,11 @@ COPY . $HOME
 RUN apk add --no-cache build-base libxslt-dev libxml2 &&\
 python -m pip install pipenv && \
 pipenv lock -r > requirements.txt && \
-pip install -r requirements.txt
+pip install -r requirements.txt && \
+chown -R 1000:1000 /tmp/app/ && \
+chmod a+x /tmp/app/init.sh
+
+USER 1000:1000
 
 CMD ["/bin/sh", "-c", "$HOME/init.sh"]
 
