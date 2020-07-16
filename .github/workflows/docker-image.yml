@@ -29,7 +29,7 @@ jobs:
           # Server address of Docker registry. If not set then will default to Docker Hub
           # registry: # optional
           # Docker repository to tag the image with
-          repository: ${{ secrets.DOCKER_REPOSITORY_USERNAME }}
+          repository: ${{ secrets.DOCKER_REPOSITORY_USERNAME }}/freenom-domain-updater
           # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
           tags: ${{ steps.time.outputs.time }}
           # Automatically tags the built image with the git reference as per the readme
