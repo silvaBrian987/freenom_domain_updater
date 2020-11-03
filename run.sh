@@ -8,7 +8,7 @@ fi
 
 APP_ARGS="$APP_ARGS -u $FREENOM_USERNAME -p $FREENOM_PASSWORD -d $FREENOM_DOMAINS"
 
-python ./app.py $APP_ARGS
+python $HOME/app.py $APP_ARGS
 
 if [ $? -ne 0 ]; then
     exit $?
