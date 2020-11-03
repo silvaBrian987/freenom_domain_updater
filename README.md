@@ -20,3 +20,15 @@ Password of Freenom's account
 ### FREENOM_DOMAINS
 
 A comma-separated list of Freenom's domains
+
+### SCHEDULED
+
+Boolean value to active the 15min cron schedule
+
+### SCHEDULED_DEBUG
+
+Boolean value to set cron to 1 minute (for debugging)
+
+## Example
+
+docker run -e SCHEDULED=true -e FREENOM_USERNAME=pepe@argento.com -e FREENOM_PASSWORD=PepeArgento -e FREENOM_DOMAINS=pepe.argento freenom-domain-updater
