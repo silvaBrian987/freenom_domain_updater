@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  freenom-domain-updater:
+    image: "marine789/freenom-domain-updater"
+    environment:
+      - "SCHEDULED=true"
+      - "FREENOM_USERNAME=$FREENOM_USERNAME"
+      - "FREENOM_PASSWORD=$FREENOM_PASSWORD"
+      - "FREENOM_DOMAINS=$FREENOM_DOMAINS"
